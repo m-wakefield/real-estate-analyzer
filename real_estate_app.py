@@ -1,10 +1,10 @@
+
 import streamlit as st
 import matplotlib.pyplot as plt
 import pandas as pd
 import io
 
 st.set_page_config(page_title="Real Estate Analyzer", layout="wide")
-
 st.title("Real Estate Investment Analyzer")
 
 # Sidebar Inputs
@@ -16,6 +16,11 @@ loan_term = st.sidebar.number_input("Loan Term (years)", value=30)
 annual_property_tax = st.sidebar.number_input("Annual Property Tax ($)", value=3600)
 annual_insurance = st.sidebar.number_input("Annual Insurance ($)", value=1200)
 monthly_maintenance = st.sidebar.number_input("Monthly Maintenance ($)", value=150)
+square_footage = st.sidebar.number_input("Property Square Footage", value=1500)
+
+st.sidebar.header("Local Comps")
+avg_price_per_sqft = st.sidebar.number_input("Average Price per Sq Ft ($)", value=160.0)
+avg_rent_per_sqft = st.sidebar.number_input("Average Rent per Sq Ft ($)", value=1.2)
 
 st.sidebar.header("Rent & Market")
 rent_low = st.sidebar.number_input("Low Rent Estimate ($)", value=1600)
@@ -40,9 +45,11 @@ total_monthly_cost = mortgage + monthly_property_tax + monthly_insurance + month
 
 future_value = purchase_price * ((1 + appreciation_rate / 100) ** hold_years)
 appreciation_gain = future_value - purchase_price
-
-# Flip Analysis
 flip_profit = target_resale_value - purchase_price - rehab_cost
+
+# Sq Ft Comps
+market_value_by_sqft = avg_price_per_sqft * square_footage
+rent_estimate_by_sqft = avg_rent_per_sqft * square_footage
 
 # Rent Scenarios
 rent_data = []
@@ -88,17 +95,25 @@ st.write(f"Expected Appreciation Gain: **${appreciation_gain:,.2f}**")
 st.subheader("Flip Profit Analysis")
 st.write(f"Flip Profit (Resale - Purchase - Rehab): **${flip_profit:,.2f}**")
 
+st.subheader("Sq Ft Comparison Analysis")
+st.write(f"**Estimated Market Value (by area comps):** ${market_value_by_sqft:,.2f}")
+st.write(f"**Your Purchase Price:** ${purchase_price:,.2f}")
+st.write(f"**Difference:** ${market_value_by_sqft - purchase_price:,.2f}")
+st.write(f"**Estimated Rent (by area comps):** ${rent_estimate_by_sqft:,.2f}")
+
 st.subheader("Rental Strategy Comparison")
 for i, row in df.iterrows():
-    st.markdown(f"""
-    <div style="padding: 10px; border-left: 5px solid {row['Color']}; background-color: #f9f9f9; margin-bottom: 10px;">
-        <strong>Rent:</strong> ${row['Rent']} <br>
-        <strong>Monthly Cash Flow:</strong> ${row['Monthly Cash Flow']} <br>
-        <strong>Annual Profit:</strong> ${row['Annual Profit']} <br>
-        <strong>ROI:</strong> {row['ROI (%)']}% <br>
-        <strong>Strategy:</strong> <span style="color:{row['Color']}; font-weight:bold;">{row['Strategy']}</span>
-    </div>
-    """, unsafe_allow_html=True)
+    st.markdown(
+        f'''
+        <div style="padding: 10px; border-left: 5px solid {row["Color"]}; background-color: #f9f9f9; margin-bottom: 10px;">
+            <strong>Rent:</strong> ${row["Rent"]} <br>
+            <strong>Monthly Cash Flow:</strong> ${row["Monthly Cash Flow"]} <br>
+            <strong>Annual Profit:</strong> ${row["Annual Profit"]} <br>
+            <strong>ROI:</strong> {row["ROI (%)"]}% <br>
+            <strong>Strategy:</strong> <span style="color:{row["Color"]}; font-weight:bold;">{row["Strategy"]}</span>
+        </div>
+        ''', unsafe_allow_html=True
+    )
 
 # Chart
 st.subheader("Cash Flow Comparison")
