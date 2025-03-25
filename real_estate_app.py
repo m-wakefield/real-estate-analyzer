@@ -9,6 +9,7 @@ st.title("Real Estate Investment Analyzer")
 
 # Sidebar Inputs
 st.sidebar.header("Property Details")
+st.info("📱 On mobile? Tap the top-left menu ☰ to enter property info.")
 purchase_price = st.sidebar.number_input("Purchase Price ($)", value=200000)
 down_payment = st.sidebar.number_input("Down Payment ($)", value=40000)
 interest_rate = st.sidebar.number_input("Interest Rate (%)", value=6.5)
